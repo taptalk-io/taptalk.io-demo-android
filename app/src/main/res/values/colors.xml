@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="tapColorPrimaryExtraLight">@color/tapHighlightBlue</color>
+    <color name="tapColorPrimaryLight">@color/tapPurplishBlue</color>
+    <color name="tapColorPrimary">@color/tapBubbleBlue</color>
+    <color name="tapColorPrimaryDark">@color/tapBluePurple</color>
+    <color name="tapColorAccent">@color/colorAccent</color>
+</resources>
