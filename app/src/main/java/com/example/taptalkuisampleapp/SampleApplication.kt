@@ -32,13 +32,13 @@ class SampleApplication : Application() {
         super.onCreate()
         TapTalk.setLoggingEnabled(true)
         TapTalk.init(
-            this, "ddf6fc9507a3a4f6386c3d6b8",
-            "MzMzMTQ0QDUuMjMuMTEwQDE1Njg4MjIzMTk/OWRjYmU2YzI/NGIyMjQyMzdiMzIy/MmYwODE4NWU0Nzc2",
+            this, "APP_KEY_ID",
+            "APP_KEY_SECRET",
             R.mipmap.ic_launcher, "TapTalk Dev Sample App",
-            "https://e-dev-43588589a565102ffa8d6a92bff6b4f4.io.taptalk.io",
+            "API_BASE_URL",
             TapTalk.TapTalkImplementationType.TapTalkImplementationTypeUI,
             tapListener
         )
-        TapTalk.initializeGooglePlacesApiKey("AIzaSyA1kCb7yq2shvC3BnzriJLcTfzQdmzSnPA")
+        TapTalk.initializeGooglePlacesApiKey("GOOGLE_PLACES_API_KEY")
     }
 }
