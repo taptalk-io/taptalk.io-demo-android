@@ -31,7 +31,7 @@
                     android:resource="@xml/file_paths" />
         </provider>
 
-        <service android:name="io.taptalk.TapTalk.Firebase.MyFireMsgService">
+        <service android:name="io.taptalk.TapTalk.Firebase.TapFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -46,6 +46,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".TAPLoginActivity" />
+        <activity android:name=".TAPRegisterActivity" />
     </application>
 
 </manifest>

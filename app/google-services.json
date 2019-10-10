@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "37150078692",
+    "firebase_url": "https://taptalkuisampleapp.firebaseio.com",
+    "project_id": "taptalkuisampleapp",
+    "storage_bucket": "taptalkuisampleapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37150078692:android:0301bb7670bab901",
+        "android_client_info": {
+          "package_name": "com.example.taptalkuisampleapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "37150078692-vi74nv4p8il8979sl54g828fc8ncka0e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.taptalkuisampleapp",
+            "certificate_hash": "3d84012c309100c0dd8262ec80e1ac00499d48e9"
+          }
+        },
+        {
+          "client_id": "37150078692-aem78a5cfvhs6qph1mom30t5tt842joe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXQhzaGumLkDk6vWbI0l_uEI0ifYOfTf4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "37150078692-aem78a5cfvhs6qph1mom30t5tt842joe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
