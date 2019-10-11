@@ -1,6 +1,7 @@
 package com.example.taptalkuisampleapp
 
 import android.app.Application
+import android.content.Intent
 import io.taptalk.TapTalk.Helper.TapTalk
 import io.taptalk.TapTalk.Listener.TapListener
 import io.taptalk.TapTalk.Model.TAPMessageModel
@@ -12,6 +13,9 @@ class SampleApplication : Application() {
     private val tapListener = object : TapListener() {
         override fun onTapTalkRefreshTokenExpired() {
             super.onTapTalkRefreshTokenExpired()
+            val intent = Intent(applicationContext, TAPLoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            applicationContext.startActivity(intent)
         }
 
         override fun onTapTalkUnreadChatRoomBadgeCountUpdated(i: Int) {
