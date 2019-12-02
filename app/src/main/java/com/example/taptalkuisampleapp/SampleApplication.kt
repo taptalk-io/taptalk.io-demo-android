@@ -1,10 +1,12 @@
 package com.example.taptalkuisampleapp
 
+import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import io.taptalk.TapTalk.Helper.TapTalk
 import io.taptalk.TapTalk.Listener.TapListener
 import io.taptalk.TapTalk.Model.TAPMessageModel
+import io.taptalk.TapTalk.View.Activity.TapUIRoomListActivity
 
 class SampleApplication : Application() {
 
@@ -24,11 +26,15 @@ class SampleApplication : Application() {
 
         override fun onNotificationReceived(tapMessageModel: TAPMessageModel?) {
             super.onNotificationReceived(tapMessageModel)
-            TapTalk.showTaptalkNotification(tapMessageModel)
+            TapTalk.showTapTalkNotification(tapMessageModel)
         }
 
         override fun onUserLogout() {
             super.onUserLogout()
+        }
+
+        override fun onTaskRootChatRoomClosed(activity: Activity?) {
+            startActivity(Intent(activity, TapUIRoomListActivity::class.java))
         }
     }
 
