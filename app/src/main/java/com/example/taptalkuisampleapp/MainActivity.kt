@@ -2,8 +2,7 @@ package com.example.taptalkuisampleapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import io.taptalk.TapTalk.Helper.TapTalk
+import androidx.appcompat.app.AppCompatActivity
 import io.taptalk.TapTalk.Manager.TAPDataManager
 import io.taptalk.TapTalk.Manager.TapUI
 

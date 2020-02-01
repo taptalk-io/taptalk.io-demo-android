@@ -2,7 +2,6 @@ package com.example.taptalkuisampleapp
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProviders
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,8 +9,6 @@ import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.res.ResourcesCompat
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -21,6 +18,9 @@ import android.view.ViewTreeObserver
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
@@ -43,9 +43,7 @@ import io.taptalk.TapTalk.Model.ResponseModel.TAPCheckUsernameResponse
 import io.taptalk.TapTalk.Model.ResponseModel.TAPRegisterResponse
 import io.taptalk.TapTalk.Model.TAPErrorModel
 import io.taptalk.TapTalk.View.Activity.TAPBaseActivity
-import io.taptalk.TapTalk.View.BottomSheet.TAPAttachmentBottomSheet
 import io.taptalk.TapTalk.ViewModel.TAPRegisterViewModel
-import com.example.taptalkuisampleapp.R
 import kotlinx.android.synthetic.main.tap_activity_register.*
 
 class TAPRegisterActivity : TAPBaseActivity() {
@@ -98,14 +96,23 @@ class TAPRegisterActivity : TAPBaseActivity() {
         overridePendingTransition(R.anim.tap_stay, R.anim.tap_slide_right)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             when (requestCode) {
                 PERMISSION_CAMERA_CAMERA, PERMISSION_WRITE_EXTERNAL_STORAGE_CAMERA -> {
-                    vm.profilePictureUri = TAPUtils.getInstance().takePicture(this@TAPRegisterActivity, PICK_PROFILE_IMAGE_CAMERA)
+                    vm.profilePictureUri = TAPUtils
+                        .takePicture(this@TAPRegisterActivity, PICK_PROFILE_IMAGE_CAMERA)
                 }
                 PERMISSION_READ_EXTERNAL_STORAGE_GALLERY -> {
-                    TAPUtils.getInstance().pickImageFromGallery(this@TAPRegisterActivity, PICK_PROFILE_IMAGE_GALLERY, false)
+                    TAPUtils.pickImageFromGallery(
+                        this@TAPRegisterActivity,
+                        PICK_PROFILE_IMAGE_GALLERY,
+                        false
+                    )
                 }
             }
         }
@@ -152,21 +159,26 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
         if (vm.countryFlagUrl != "") {
             glide.load(vm.countryFlagUrl)
-                    .apply(RequestOptions().placeholder(R.drawable.tap_ic_default_flag))
-                    .into(iv_country_flag)
+                .apply(RequestOptions().placeholder(R.drawable.tap_ic_default_flag))
+                .into(iv_country_flag)
         }
 
         // Obtain text field style attributes
-        val typedArray = obtainStyledAttributes(R.style.tapFormTextFieldStyle, R.styleable.TextAppearance)
-        vm.fontResourceId = typedArray.getResourceId(R.styleable.TextAppearance_android_fontFamily, -1)
-        vm.textFieldFontColor = typedArray.getColor(R.styleable.TextAppearance_android_textColor, -1)
-        vm.textFieldFontColorHint = typedArray.getColor(R.styleable.TextAppearance_android_textColorHint, -1)
+        val typedArray =
+            obtainStyledAttributes(R.style.tapFormTextFieldStyle, R.styleable.TextAppearance)
+        vm.fontResourceId =
+            typedArray.getResourceId(R.styleable.TextAppearance_android_fontFamily, -1)
+        vm.textFieldFontColor =
+            typedArray.getColor(R.styleable.TextAppearance_android_textColor, -1)
+        vm.textFieldFontColorHint =
+            typedArray.getColor(R.styleable.TextAppearance_android_textColorHint, -1)
 
         typedArray.recycle()
 
         // Set password field input type and typeface
         et_password.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        et_retype_password.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        et_retype_password.inputType =
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 
         et_password.typeface = ResourcesCompat.getFont(this, vm.fontResourceId)
         et_retype_password.typeface = ResourcesCompat.getFont(this, vm.fontResourceId)
@@ -181,7 +193,7 @@ class TAPRegisterActivity : TAPBaseActivity() {
             vm.formCheck[indexMobileNumber] = stateValid
         }
 
-        TAPUtils.getInstance().showKeyboard(this, et_full_name)
+        TAPUtils.showKeyboard(this, et_full_name)
 
         fl_container.setOnClickListener { clearAllFocus() }
         cl_form_container.setOnClickListener { clearAllFocus() }
@@ -189,8 +201,18 @@ class TAPRegisterActivity : TAPBaseActivity() {
         civ_profile_picture.setOnClickListener { showProfilePicturePickerBottomSheet() }
         ll_change_profile_picture.setOnClickListener { showProfilePicturePickerBottomSheet() }
         fl_remove_profile_picture.setOnClickListener { removeProfilePicture() }
-        iv_view_password.setOnClickListener { togglePasswordVisibility(et_password, iv_view_password) }
-        iv_view_password_retype.setOnClickListener { togglePasswordVisibility(et_retype_password, iv_view_password_retype) }
+        iv_view_password.setOnClickListener {
+            togglePasswordVisibility(
+                et_password,
+                iv_view_password
+            )
+        }
+        iv_view_password_retype.setOnClickListener {
+            togglePasswordVisibility(
+                et_retype_password,
+                iv_view_password_retype
+            )
+        }
 
         et_retype_password.setOnEditorActionListener { v, a, e -> fl_button_continue.callOnClick() }
 
@@ -205,16 +227,18 @@ class TAPRegisterActivity : TAPBaseActivity() {
         tv_label_retype_password.visibility = View.GONE
         tv_label_retype_password_error.visibility = View.GONE
         cl_retype_password.visibility = View.GONE
-        et_email_address.setOnEditorActionListener{ v, a, e -> fl_button_continue.callOnClick() }
+        et_email_address.setOnEditorActionListener { v, a, e -> fl_button_continue.callOnClick() }
     }
 
     private fun registerBroadcastReceiver() {
-        TAPBroadcastManager.register(this@TAPRegisterActivity, uploadBroadcastReceiver,
-                UploadProgressLoading, UploadProgressFinish, UploadFailed)
+        TAPBroadcastManager.register(
+            this@TAPRegisterActivity, uploadBroadcastReceiver,
+            UploadProgressLoading, UploadProgressFinish, UploadFailed
+        )
     }
 
     private fun showProfilePicturePickerBottomSheet() {
-        TAPUtils.getInstance().dismissKeyboard(this@TAPRegisterActivity)
+        TAPUtils.dismissKeyboard(this@TAPRegisterActivity)
 //        TAPAttachmentBottomSheet(true, profilePicturePickerListener).show(supportFragmentManager, "")
     }
 
@@ -229,7 +253,11 @@ class TAPRegisterActivity : TAPBaseActivity() {
             glide.load(R.drawable.tap_img_default_avatar).into(civ_profile_picture)
             fl_remove_profile_picture.visibility = View.GONE
             if (showErrorMessage) {
-                Toast.makeText(this@TAPRegisterActivity, getString(R.string.tap_failed_to_load_image), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@TAPRegisterActivity,
+                    getString(R.string.tap_failed_to_load_image),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         } else {
             vm.formCheck[indexProfilePicture] = stateValid
@@ -261,11 +289,13 @@ class TAPRegisterActivity : TAPBaseActivity() {
     private fun checkUsername(hasFocus: Boolean) {
         TAPDataManager.getInstance().cancelCheckUsernameApiCall()
         if (et_username.text.isNotEmpty() && et_username.text.length in 4..32 &&
-                et_username.text.matches(Regex("[a-z0-9._]*")) &&
-                et_username.text[0].isLetter() &&
-                et_username.text[et_username.text.lastIndex].isLetterOrDigit()) {
+            et_username.text.matches(Regex("[a-z0-9._]*")) &&
+            et_username.text[0].isLetter() &&
+            et_username.text[et_username.text.lastIndex].isLetterOrDigit()
+        ) {
             // Valid username, continue to check if username exists
-            TAPDataManager.getInstance().checkUsernameExists(et_username.text.toString(), checkUsernameView)
+            TAPDataManager.getInstance()
+                .checkUsernameExists(et_username.text.toString(), checkUsernameView)
         } else if (et_username.text.isEmpty()) {
             // Not filled
             vm.formCheck[indexUsername] = stateEmpty
@@ -308,7 +338,8 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
     private fun checkPassword(hasFocus: Boolean) {
         // Regex to match string containing lowercase, uppercase, number, and special character
-        val regex = Regex("^(?=.*?\\p{Lu})(?=.*?\\p{Ll})(?=.*?\\d)" + "(?=.*?[`~!@#$%^&*()\\-_=+\\\\|\\[{\\]};:'\",<.>/?]).*$")
+        val regex =
+            Regex("^(?=.*?\\p{Lu})(?=.*?\\p{Ll})(?=.*?\\d)" + "(?=.*?[`~!@#$%^&*()\\-_=+\\\\|\\[{\\]};:'\",<.>/?]).*$")
         if (et_password.text.isNotEmpty() && et_password.text.matches(regex)) {
             // Valid password
             vm.formCheck[indexPassword] = stateValid
@@ -324,7 +355,12 @@ class TAPRegisterActivity : TAPBaseActivity() {
             vm.formCheck[indexPassword] = stateInvalid
             tv_label_password_error.visibility = View.VISIBLE
             cl_password.background = getDrawable(R.drawable.tap_bg_text_field_error)
-            v_password_separator.setBackgroundColor(ContextCompat.getColor(this, R.color.tapColorError))
+            v_password_separator.setBackgroundColor(
+                ContextCompat.getColor(
+                    this,
+                    R.color.tapColorError
+                )
+            )
         }
         if (et_retype_password.text.isNotEmpty()) {
             checkRetypedPassword(et_retype_password.hasFocus())
@@ -348,7 +384,12 @@ class TAPRegisterActivity : TAPBaseActivity() {
             vm.formCheck[indexPasswordRetype] = stateInvalid
             tv_label_retype_password_error.visibility = View.VISIBLE
             cl_retype_password.background = getDrawable(R.drawable.tap_bg_text_field_error)
-            v_retype_password_separator.setBackgroundColor(ContextCompat.getColor(this, R.color.tapColorError))
+            v_retype_password_separator.setBackgroundColor(
+                ContextCompat.getColor(
+                    this,
+                    R.color.tapColorError
+                )
+            )
         }
         checkContinueButtonAvailability()
     }
@@ -361,26 +402,47 @@ class TAPRegisterActivity : TAPBaseActivity() {
         }
         if (view == cl_password) {
             if (hasFocus) {
-                v_password_separator.setBackgroundColor(ContextCompat.getColor(this, R.color.tapTextFieldBorderActiveColor))
+                v_password_separator.setBackgroundColor(
+                    ContextCompat.getColor(
+                        this,
+                        R.color.tapTextFieldBorderActiveColor
+                    )
+                )
             } else {
-                v_password_separator.setBackgroundColor(ContextCompat.getColor(this, R.color.tapGreyDc))
+                v_password_separator.setBackgroundColor(
+                    ContextCompat.getColor(
+                        this,
+                        R.color.tapGreyDc
+                    )
+                )
             }
         } else if (view == cl_retype_password) {
             if (hasFocus) {
-                v_retype_password_separator.setBackgroundColor(ContextCompat.getColor(this, R.color.tapTextFieldBorderActiveColor))
+                v_retype_password_separator.setBackgroundColor(
+                    ContextCompat.getColor(
+                        this,
+                        R.color.tapTextFieldBorderActiveColor
+                    )
+                )
             } else {
-                v_retype_password_separator.setBackgroundColor(ContextCompat.getColor(this, R.color.tapGreyDc))
+                v_retype_password_separator.setBackgroundColor(
+                    ContextCompat.getColor(
+                        this,
+                        R.color.tapGreyDc
+                    )
+                )
             }
         }
     }
 
     private fun checkContinueButtonAvailability() {
         if (vm.formCheck[indexFullName] == stateValid &&
-                vm.formCheck[indexUsername] == stateValid &&
-                vm.formCheck[indexMobileNumber] == stateValid &&
-                (vm.formCheck[indexEmail] == stateEmpty || vm.formCheck[indexEmail] == stateValid) && (
-                        (vm.formCheck[indexPassword] == stateEmpty && vm.formCheck[indexPasswordRetype] == stateEmpty) ||
-                                (vm.formCheck[indexPassword] == stateValid && vm.formCheck[indexPasswordRetype] == stateValid))) {
+            vm.formCheck[indexUsername] == stateValid &&
+            vm.formCheck[indexMobileNumber] == stateValid &&
+            (vm.formCheck[indexEmail] == stateEmpty || vm.formCheck[indexEmail] == stateValid) && (
+                    (vm.formCheck[indexPassword] == stateEmpty && vm.formCheck[indexPasswordRetype] == stateEmpty) ||
+                            (vm.formCheck[indexPassword] == stateValid && vm.formCheck[indexPasswordRetype] == stateValid))
+        ) {
             // All forms valid
             enableContinueButton()
         } else {
@@ -400,18 +462,29 @@ class TAPRegisterActivity : TAPBaseActivity() {
     }
 
     private fun clearAllFocus() {
-        TAPUtils.getInstance().dismissKeyboard(this)
+        TAPUtils.dismissKeyboard(this)
         fl_container.clearFocus()
     }
 
     private fun togglePasswordVisibility(editText: EditText, button: ImageView) {
         val cursorPosition = editText.selectionStart
         if (editText.inputType == InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD) {
-            editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-            button.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.tapIconViewPasswordActive))
+            editText.inputType =
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            button.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    this,
+                    R.color.tapIconViewPasswordActive
+                )
+            )
         } else {
             editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            button.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.tapIconViewPasswordInactive))
+            button.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    this,
+                    R.color.tapIconViewPasswordInactive
+                )
+            )
         }
         editText.typeface = ResourcesCompat.getFont(this, vm.fontResourceId)
         editText.setSelection(cursorPosition)
@@ -419,13 +492,13 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
     private fun register() {
         TAPDataManager.getInstance().register(
-                et_full_name.text.toString(),
-                et_username.text.toString(),
-                vm.countryID,
-                et_mobile_number.text.toString(),
-                et_email_address.text.toString(),
-                et_password.text.toString(),
-                registerView
+            et_full_name.text.toString(),
+            et_username.text.toString(),
+            vm.countryID,
+            et_mobile_number.text.toString(),
+            et_email_address.text.toString(),
+            et_password.text.toString(),
+            registerView
         )
     }
 
@@ -433,13 +506,13 @@ class TAPRegisterActivity : TAPBaseActivity() {
         vm.isUpdatingProfile = false
         enableEditing()
         TapTalkDialog.Builder(this)
-                .setDialogType(TapTalkDialog.DialogType.ERROR_DIALOG)
-                .setTitle(getString(R.string.tap_error))
-                .setMessage(message)
-                .setPrimaryButtonTitle(getString(R.string.tap_ok))
-                .setPrimaryButtonListener(true) { }
-                .setCancelable(true)
-                .show()
+            .setDialogType(TapTalkDialog.DialogType.ERROR_DIALOG)
+            .setTitle(getString(R.string.tap_error))
+            .setMessage(message)
+            .setPrimaryButtonTitle(getString(R.string.tap_ok))
+            .setPrimaryButtonListener(true) { }
+            .setCancelable(true)
+            .show()
     }
 
     private fun disableEditing() {
@@ -449,8 +522,13 @@ class TAPRegisterActivity : TAPBaseActivity() {
         fl_remove_profile_picture.setOnClickListener(null)
         fl_button_continue.setOnClickListener(null)
 
-        iv_button_back.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.tap_ic_loading_progress_circle_white))
-        TAPUtils.getInstance().rotateAnimateInfinitely(this, iv_button_back)
+        iv_button_back.setImageDrawable(
+            ContextCompat.getDrawable(
+                this,
+                R.drawable.tap_ic_loading_progress_circle_white
+            )
+        )
+        TAPUtils.rotateAnimateInfinitely(this, iv_button_back)
 
         et_full_name.isEnabled = false
         et_username.isEnabled = false
@@ -466,7 +544,7 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
         tv_button_continue.visibility = View.GONE
         iv_register_progress.visibility = View.VISIBLE
-        TAPUtils.getInstance().rotateAnimateInfinitely(this, iv_register_progress)
+        TAPUtils.rotateAnimateInfinitely(this, iv_register_progress)
     }
 
     private fun enableEditing() {
@@ -476,7 +554,12 @@ class TAPRegisterActivity : TAPBaseActivity() {
         fl_remove_profile_picture.setOnClickListener { removeProfilePicture() }
         fl_button_continue.setOnClickListener { register() }
 
-        iv_button_back.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.tap_ic_chevron_left_white))
+        iv_button_back.setImageDrawable(
+            ContextCompat.getDrawable(
+                this,
+                R.drawable.tap_ic_chevron_left_white
+            )
+        )
         iv_button_back.clearAnimation()
 
         et_full_name.isEnabled = true
@@ -500,7 +583,11 @@ class TAPRegisterActivity : TAPBaseActivity() {
     private fun uploadProfilePicture() {
         vm.isUploadingProfilePicture = true
         pb_profile_picture_progress.progress = 0
-        TAPFileUploadManager.getInstance().uploadProfilePicture(this@TAPRegisterActivity, vm.profilePictureUri, vm.myUserModel.userID)
+        TAPFileUploadManager.getInstance().uploadProfilePicture(
+            this@TAPRegisterActivity,
+            vm.profilePictureUri,
+            vm.myUserModel.userID
+        )
     }
 
     private fun finishRegisterAndOpenRoomList() {
@@ -511,17 +598,19 @@ class TAPRegisterActivity : TAPBaseActivity() {
     private val profilePicturePickerListener = object : TAPAttachmentListener() {
 
         override fun onCameraSelected() {
-            vm.profilePictureUri = TAPUtils.getInstance().takePicture(this@TAPRegisterActivity, PICK_PROFILE_IMAGE_CAMERA)
+            vm.profilePictureUri = TAPUtils
+                .takePicture(this@TAPRegisterActivity, PICK_PROFILE_IMAGE_CAMERA)
         }
 
         override fun onGallerySelected() {
-            TAPUtils.getInstance().pickImageFromGallery(this@TAPRegisterActivity, PICK_PROFILE_IMAGE_GALLERY, false)
+            TAPUtils
+                .pickImageFromGallery(this@TAPRegisterActivity, PICK_PROFILE_IMAGE_GALLERY, false)
         }
     }
 
     private val fullNameFocusListener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus) {
-            view.elevation = TAPUtils.getInstance().dpToPx(4).toFloat()
+            view.elevation = TAPUtils.dpToPx(4).toFloat()
             if (vm.formCheck[indexFullName] != stateInvalid) {
                 view.background = getDrawable(R.drawable.tap_bg_text_field_active)
             }
@@ -535,7 +624,7 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
     private val usernameFocusListener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus) {
-            view.elevation = TAPUtils.getInstance().dpToPx(4).toFloat()
+            view.elevation = TAPUtils.dpToPx(4).toFloat()
             if (vm.formCheck[indexUsername] != stateInvalid) {
                 view.background = getDrawable(R.drawable.tap_bg_text_field_active)
             }
@@ -549,7 +638,7 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
     private val emailAddressFocusListener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus) {
-            view.elevation = TAPUtils.getInstance().dpToPx(4).toFloat()
+            view.elevation = TAPUtils.dpToPx(4).toFloat()
             if (vm.formCheck[indexEmail] != stateInvalid) {
                 view.background = getDrawable(R.drawable.tap_bg_text_field_active)
             }
@@ -563,7 +652,7 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
     private val passwordFocusListener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus) {
-            cl_password.elevation = TAPUtils.getInstance().dpToPx(4).toFloat()
+            cl_password.elevation = TAPUtils.dpToPx(4).toFloat()
             if (vm.formCheck[indexPassword] != stateInvalid) {
                 cl_password.background = getDrawable(R.drawable.tap_bg_text_field_active)
                 v_password_separator.setBackgroundColor(resources.getColor(R.color.tapTextFieldBorderActiveColor))
@@ -578,7 +667,7 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
     private val passwordRetypeFocusListener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus) {
-            cl_retype_password.elevation = TAPUtils.getInstance().dpToPx(4).toFloat()
+            cl_retype_password.elevation = TAPUtils.dpToPx(4).toFloat()
             if (vm.formCheck[indexPasswordRetype] != stateInvalid) {
                 cl_retype_password.background = getDrawable(R.drawable.tap_bg_text_field_active)
                 v_retype_password_separator.setBackgroundColor(resources.getColor(R.color.tapTextFieldBorderActiveColor))
@@ -708,8 +797,10 @@ class TAPRegisterActivity : TAPBaseActivity() {
         }
 
         override fun onError(error: TAPErrorModel?) {
-            setErrorResult(error?.message
-                    ?: getString(R.string.tap_error_unable_to_verify_username))
+            setErrorResult(
+                error?.message
+                    ?: getString(R.string.tap_error_unable_to_verify_username)
+            )
         }
 
         override fun onError(throwable: Throwable?) {
@@ -733,7 +824,7 @@ class TAPRegisterActivity : TAPBaseActivity() {
             0 ->
                 fl_action_bar.elevation = 0f
             else ->
-                fl_action_bar.elevation = TAPUtils.getInstance().dpToPx(2).toFloat()
+                fl_action_bar.elevation = TAPUtils.dpToPx(2).toFloat()
         }
     }
 
@@ -745,31 +836,33 @@ class TAPRegisterActivity : TAPBaseActivity() {
 
         override fun onSuccess(response: TAPRegisterResponse?) {
             TapTalk.authenticateWithAuthTicket(response?.ticket ?: "", true,
-                    object : TapCommonListener() {
-                        override fun onSuccess(successMessage: String?) {
-                            TAPDataManager.getInstance().saveMyCountryCode(vm.countryCallingCode)
-                            TAPDataManager.getInstance().saveMyCountryFlagUrl(vm.countryFlagUrl)
-                            if (null != vm.profilePictureUri) {
-                                uploadProfilePicture()
-                            } else {
-                                finishRegisterAndOpenRoomList()
-                            }
-                        }
-
-                        override fun onError(errorCode: String?, errorMessage: String?) {
-                            TapTalkDialog.Builder(this@TAPRegisterActivity)
-                                    .setDialogType(TapTalkDialog.DialogType.ERROR_DIALOG)
-                                    .setTitle(getString(R.string.tap_error))
-                                    .setMessage(errorMessage)
-                                    .setPrimaryButtonTitle(getString(R.string.tap_retry))
-                                    .setPrimaryButtonListener(true) {
-                                        TapTalk.authenticateWithAuthTicket(response?.ticket
-                                                ?: "", true, this)
-                                    }
-                                    .setCancelable(false)
-                                    .show()
+                object : TapCommonListener() {
+                    override fun onSuccess(successMessage: String?) {
+                        TAPDataManager.getInstance().saveMyCountryCode(vm.countryCallingCode)
+                        TAPDataManager.getInstance().saveMyCountryFlagUrl(vm.countryFlagUrl)
+                        if (null != vm.profilePictureUri) {
+                            uploadProfilePicture()
+                        } else {
+                            finishRegisterAndOpenRoomList()
                         }
                     }
+
+                    override fun onError(errorCode: String?, errorMessage: String?) {
+                        TapTalkDialog.Builder(this@TAPRegisterActivity)
+                            .setDialogType(TapTalkDialog.DialogType.ERROR_DIALOG)
+                            .setTitle(getString(R.string.tap_error))
+                            .setMessage(errorMessage)
+                            .setPrimaryButtonTitle(getString(R.string.tap_retry))
+                            .setPrimaryButtonListener(true) {
+                                TapTalk.authenticateWithAuthTicket(
+                                    response?.ticket
+                                        ?: "", true, this
+                                )
+                            }
+                            .setCancelable(false)
+                            .show()
+                    }
+                }
             )
             vm.isUpdatingProfile = false
         }
@@ -789,7 +882,7 @@ class TAPRegisterActivity : TAPBaseActivity() {
             when (action) {
                 UploadProgressLoading -> {
                     pb_profile_picture_progress.progress = TAPFileUploadManager.getInstance()
-                            .getUploadProgressPercent(vm.myUserModel.userID) ?: 0
+                        .getUploadProgressPercent(vm.myUserModel.userID) ?: 0
                 }
                 UploadProgressFinish -> {
                     finishRegisterAndOpenRoomList()
@@ -799,16 +892,18 @@ class TAPRegisterActivity : TAPBaseActivity() {
                     if (null != userID && userID == vm.myUserModel.userID) {
                         vm.isUploadingProfilePicture = false
                         TapTalkDialog.Builder(this@TAPRegisterActivity)
-                                .setDialogType(TapTalkDialog.DialogType.DEFAULT)
-                                .setTitle(getString(R.string.tap_error_unable_to_upload))
-                                .setMessage(intent.getStringExtra(UploadFailedErrorMessage)
-                                        ?: getString(R.string.tap_error_upload_profile_picture))
-                                .setPrimaryButtonTitle(getString(R.string.tap_retry))
-                                .setPrimaryButtonListener(true) { uploadProfilePicture() }
-                                .setSecondaryButtonTitle(getString(R.string.tap_skip))
-                                .setSecondaryButtonListener { finishRegisterAndOpenRoomList() }
-                                .setCancelable(false)
-                                .show()
+                            .setDialogType(TapTalkDialog.DialogType.DEFAULT)
+                            .setTitle(getString(R.string.tap_error_unable_to_upload))
+                            .setMessage(
+                                intent.getStringExtra(UploadFailedErrorMessage)
+                                    ?: getString(R.string.tap_error_upload_profile_picture)
+                            )
+                            .setPrimaryButtonTitle(getString(R.string.tap_retry))
+                            .setPrimaryButtonListener(true) { uploadProfilePicture() }
+                            .setSecondaryButtonTitle(getString(R.string.tap_skip))
+                            .setSecondaryButtonListener { finishRegisterAndOpenRoomList() }
+                            .setCancelable(false)
+                            .show()
                     }
                 }
             }

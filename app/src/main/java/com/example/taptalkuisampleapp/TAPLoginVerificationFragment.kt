@@ -4,13 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.example.taptalkuisampleapp.R
 import com.example.taptalkuisampleapp.TAPLoginActivity
 import com.example.taptalkuisampleapp.TAPRegisterActivity
@@ -32,9 +31,9 @@ import io.taptalk.TapTalk.View.Activity.TapUIRoomListActivity
 import kotlinx.android.synthetic.main.tap_fragment_login_verification.*
 
 
-class TAPLoginVerificationFragment : Fragment() {
+class TAPLoginVerificationFragment : androidx.fragment.app.Fragment() {
     val generalErrorMessage = context?.resources?.getString(R.string.tap_error_message_general)
-            ?: ""
+        ?: ""
     var otpTimer: CountDownTimer? = null
     val waitTime = 30L * 1000
     var phoneNumber = "0"
@@ -54,7 +53,15 @@ class TAPLoginVerificationFragment : Fragment() {
         val kCountryCallingCode = "CountryCallingCode"
         val kCountryFlagUrl = "CountryFlagUrl"
 
-        fun getInstance(otpID: Long, otpKey: String, phoneNumber: String, phoneNumberWithCode: String, countryID: Int, countryCallingCode: String, countryFlagUrl: String): TAPLoginVerificationFragment {
+        fun getInstance(
+            otpID: Long,
+            otpKey: String,
+            phoneNumber: String,
+            phoneNumberWithCode: String,
+            countryID: Int,
+            countryCallingCode: String,
+            countryFlagUrl: String
+        ): TAPLoginVerificationFragment {
             val instance = TAPLoginVerificationFragment()
             val args = Bundle()
             args.putString(kPhoneNumberWithCode, phoneNumberWithCode)
@@ -69,8 +76,10 @@ class TAPLoginVerificationFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.tap_fragment_login_verification, container, false)
     }
@@ -93,40 +102,54 @@ class TAPLoginVerificationFragment : Fragment() {
         countryID = arguments?.getInt(kCountryID) ?: 0
         countryCallingCode = arguments?.getString(kCountryCallingCode, "") ?: ""
         countryFlagUrl = arguments?.getString(kCountryFlagUrl, "") ?: ""
-        TAPUtils.getInstance().animateClickButton(iv_back_button, 0.95f)
+        TAPUtils.animateClickButton(iv_back_button, 0.95f)
         iv_back_button.setOnClickListener { activity?.onBackPressed() }
         et_otp_code.addTextChangedListener(otpTextWatcher)
         et_otp_code.requestFocus()
-        TAPUtils.getInstance().showKeyboard(activity, et_otp_code)
+        TAPUtils.showKeyboard(activity, et_otp_code)
         clearOTPEditText()
 
         if (0L != (activity as TAPLoginActivity).vm.lastLoginTimestamp
-                && (System.currentTimeMillis() - (activity as TAPLoginActivity).vm.lastLoginTimestamp) < waitTime) {
+            && (System.currentTimeMillis() - (activity as TAPLoginActivity).vm.lastLoginTimestamp) < waitTime
+        ) {
             setAndStartTimer(waitTime - (System.currentTimeMillis() - (activity as TAPLoginActivity).vm.lastLoginTimestamp))
         } else setAndStartTimer(waitTime)
         //setAndStartTimer(waitTime)
         tv_request_otp_again.setOnClickListener {
             showRequestingOTPLoading()
-            TAPDataManager.getInstance().requestOTPLogin(countryID, phoneNumber, object : TAPDefaultDataView<TAPLoginOTPResponse>() {
-                override fun onSuccess(response: TAPLoginOTPResponse) {
-                    super.onSuccess(response)
-                    requestOTPInterface.onRequestSuccess(response.otpID, response.otpKey, response.phoneWithCode, response.isSuccess)
-                }
+            TAPDataManager.getInstance().requestOTPLogin(
+                countryID,
+                phoneNumber,
+                object : TAPDefaultDataView<TAPLoginOTPResponse>() {
+                    override fun onSuccess(response: TAPLoginOTPResponse) {
+                        super.onSuccess(response)
+                        requestOTPInterface.onRequestSuccess(
+                            response.otpID,
+                            response.otpKey,
+                            response.phoneWithCode,
+                            response.isSuccess
+                        )
+                    }
 
-                override fun onError(error: TAPErrorModel) {
-                    super.onError(error)
-                    requestOTPInterface.onRequestFailed(error.message, error.code)
-                }
+                    override fun onError(error: TAPErrorModel) {
+                        super.onError(error)
+                        requestOTPInterface.onRequestFailed(error.message, error.code)
+                    }
 
-                override fun onError(errorMessage: String) {
-                    requestOTPInterface.onRequestFailed(errorMessage, "400")
-                }
-            })
+                    override fun onError(errorMessage: String) {
+                        requestOTPInterface.onRequestFailed(errorMessage, "400")
+                    }
+                })
         }
     }
 
     private val requestOTPInterface: TAPRequestOTPInterface = object : TAPRequestOTPInterface {
-        override fun onRequestSuccess(otpID: Long, otpKey: String?, phone: String?, succeess: Boolean) {
+        override fun onRequestSuccess(
+            otpID: Long,
+            otpKey: String?,
+            phone: String?,
+            succeess: Boolean
+        ) {
             val loginActivity = activity as TAPLoginActivity
             this@TAPLoginVerificationFragment.otpID = otpID
             loginActivity.vm.otpID = otpID
@@ -152,9 +175,16 @@ class TAPLoginVerificationFragment : Fragment() {
 
     private fun setAndStartTimer(waitTime: Long) {
         if (null != tv_didnt_receive_and_invalid && null != tv_otp_timer && null != tv_request_otp_again
-                && null != ll_loading_otp && null != ll_otp_sent && null != iv_progress_otp) {
-            tv_didnt_receive_and_invalid.text = resources.getText(R.string.tap_didnt_receive_the_6_digit_otp)
-            tv_didnt_receive_and_invalid.setTextColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+            && null != ll_loading_otp && null != ll_otp_sent && null != iv_progress_otp
+        ) {
+            tv_didnt_receive_and_invalid.text =
+                resources.getText(R.string.tap_didnt_receive_the_6_digit_otp)
+            tv_didnt_receive_and_invalid.setTextColor(
+                ContextCompat.getColor(
+                    TapTalk.appContext,
+                    R.color.tapColorTextDark
+                )
+            )
             tv_otp_timer.visibility = View.VISIBLE
             tv_request_otp_again.visibility = View.GONE
             ll_loading_otp.visibility = View.GONE
@@ -208,31 +238,38 @@ class TAPLoginVerificationFragment : Fragment() {
     private fun verifyOTP() {
         showVerifyingOTPLoading()
         cancelTimer()
-        TAPDataManager.getInstance().verifyOTPLogin(otpID, otpKey, et_otp_code.text.toString(), object : TAPDefaultDataView<TAPLoginOTPVerifyResponse>() {
-            override fun onSuccess(response: TAPLoginOTPVerifyResponse) {
-                if (response.isRegistered) {
-                    TapTalk.authenticateWithAuthTicket(response.ticket, true, object : TapCommonListener() {
-                        override fun onSuccess(successMessage: String) {
-                            verifyOTPInterface.verifyOTPSuccessToLogin()
-                        }
+        TAPDataManager.getInstance().verifyOTPLogin(
+            otpID,
+            otpKey,
+            et_otp_code.text.toString(),
+            object : TAPDefaultDataView<TAPLoginOTPVerifyResponse>() {
+                override fun onSuccess(response: TAPLoginOTPVerifyResponse) {
+                    if (response.isRegistered) {
+                        TapTalk.authenticateWithAuthTicket(
+                            response.ticket,
+                            true,
+                            object : TapCommonListener() {
+                                override fun onSuccess(successMessage: String) {
+                                    verifyOTPInterface.verifyOTPSuccessToLogin()
+                                }
 
-                        override fun onError(errorCode: String, errorMessage: String) {
-                            verifyOTPInterface.verifyOTPFailed(errorCode, errorMessage)
-                        }
-                    })
-                } else {
-                    verifyOTPInterface.verifyOTPSuccessToRegister()
+                                override fun onError(errorCode: String, errorMessage: String) {
+                                    verifyOTPInterface.verifyOTPFailed(errorCode, errorMessage)
+                                }
+                            })
+                    } else {
+                        verifyOTPInterface.verifyOTPSuccessToRegister()
+                    }
                 }
-            }
 
-            override fun onError(error: TAPErrorModel) {
-                verifyOTPInterface.verifyOTPFailed(error.message, error.code)
-            }
+                override fun onError(error: TAPErrorModel) {
+                    verifyOTPInterface.verifyOTPFailed(error.message, error.code)
+                }
 
-            override fun onError(errorMessage: String) {
-                verifyOTPInterface.verifyOTPFailed(errorMessage, "400")
-            }
-        })
+                override fun onError(errorMessage: String) {
+                    verifyOTPInterface.verifyOTPFailed(errorMessage, "400")
+                }
+            })
     }
 
     private val verifyOTPInterface = object : TAPVerifyOTPInterface {
@@ -261,7 +298,12 @@ class TAPLoginVerificationFragment : Fragment() {
 
         override fun verifyOTPFailed(errorCode: String?, errorMessage: String?) {
             tv_didnt_receive_and_invalid.text = resources.getText(R.string.tap_error_invalid_otp)
-            tv_didnt_receive_and_invalid.setTextColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorError))
+            tv_didnt_receive_and_invalid.setTextColor(
+                ContextCompat.getColor(
+                    TapTalk.appContext,
+                    R.color.tapColorError
+                )
+            )
             tv_request_otp_again.visibility = View.VISIBLE
             ll_loading_otp.visibility = View.GONE
             tv_otp_timer.visibility = View.GONE
@@ -299,15 +341,40 @@ class TAPLoginVerificationFragment : Fragment() {
                 1 -> {
                     v_pointer_1.visibility = View.INVISIBLE
                     v_pointer_2.visibility = View.VISIBLE
-                    v_pointer_2.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorPrimary))
+                    v_pointer_2.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorPrimary
+                        )
+                    )
                     v_pointer_3.visibility = View.VISIBLE
-                    v_pointer_3.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_3.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_4.visibility = View.VISIBLE
-                    v_pointer_4.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_4.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_5.visibility = View.VISIBLE
-                    v_pointer_5.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_5.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_6.visibility = View.VISIBLE
-                    v_pointer_6.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_6.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
 
                     iv_otp_filled_1.visibility = View.VISIBLE
                     iv_otp_filled_2.visibility = View.INVISIBLE
@@ -320,13 +387,33 @@ class TAPLoginVerificationFragment : Fragment() {
                     v_pointer_1.visibility = View.INVISIBLE
                     v_pointer_2.visibility = View.INVISIBLE
                     v_pointer_3.visibility = View.VISIBLE
-                    v_pointer_3.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorPrimary))
+                    v_pointer_3.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorPrimary
+                        )
+                    )
                     v_pointer_4.visibility = View.VISIBLE
-                    v_pointer_4.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_4.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_5.visibility = View.VISIBLE
-                    v_pointer_5.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_5.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_6.visibility = View.VISIBLE
-                    v_pointer_6.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_6.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
 
                     iv_otp_filled_1.visibility = View.VISIBLE
                     iv_otp_filled_2.visibility = View.VISIBLE
@@ -340,11 +427,26 @@ class TAPLoginVerificationFragment : Fragment() {
                     v_pointer_2.visibility = View.INVISIBLE
                     v_pointer_3.visibility = View.INVISIBLE
                     v_pointer_4.visibility = View.VISIBLE
-                    v_pointer_4.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorPrimary))
+                    v_pointer_4.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorPrimary
+                        )
+                    )
                     v_pointer_5.visibility = View.VISIBLE
-                    v_pointer_5.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_5.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_6.visibility = View.VISIBLE
-                    v_pointer_6.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_6.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
 
                     iv_otp_filled_1.visibility = View.VISIBLE
                     iv_otp_filled_2.visibility = View.VISIBLE
@@ -359,9 +461,19 @@ class TAPLoginVerificationFragment : Fragment() {
                     v_pointer_3.visibility = View.INVISIBLE
                     v_pointer_4.visibility = View.INVISIBLE
                     v_pointer_5.visibility = View.VISIBLE
-                    v_pointer_5.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorPrimary))
+                    v_pointer_5.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorPrimary
+                        )
+                    )
                     v_pointer_6.visibility = View.VISIBLE
-                    v_pointer_6.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_6.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
 
                     iv_otp_filled_1.visibility = View.VISIBLE
                     iv_otp_filled_2.visibility = View.VISIBLE
@@ -377,7 +489,12 @@ class TAPLoginVerificationFragment : Fragment() {
                     v_pointer_4.visibility = View.INVISIBLE
                     v_pointer_5.visibility = View.INVISIBLE
                     v_pointer_6.visibility = View.VISIBLE
-                    v_pointer_6.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorPrimary))
+                    v_pointer_6.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorPrimary
+                        )
+                    )
 
                     iv_otp_filled_1.visibility = View.VISIBLE
                     iv_otp_filled_2.visibility = View.VISIBLE
@@ -405,17 +522,47 @@ class TAPLoginVerificationFragment : Fragment() {
                 }
                 else -> {
                     v_pointer_1.visibility = View.VISIBLE
-                    v_pointer_1.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorPrimary))
+                    v_pointer_1.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorPrimary
+                        )
+                    )
                     v_pointer_2.visibility = View.VISIBLE
-                    v_pointer_2.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_2.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_3.visibility = View.VISIBLE
-                    v_pointer_3.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_3.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_4.visibility = View.VISIBLE
-                    v_pointer_4.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_4.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_5.visibility = View.VISIBLE
-                    v_pointer_5.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_5.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
                     v_pointer_6.visibility = View.VISIBLE
-                    v_pointer_6.setBackgroundColor(ContextCompat.getColor(TapTalk.appContext, R.color.tapColorTextDark))
+                    v_pointer_6.setBackgroundColor(
+                        ContextCompat.getColor(
+                            TapTalk.appContext,
+                            R.color.tapColorTextDark
+                        )
+                    )
 
                     iv_otp_filled_1.visibility = View.INVISIBLE
                     iv_otp_filled_2.visibility = View.INVISIBLE
@@ -430,12 +577,12 @@ class TAPLoginVerificationFragment : Fragment() {
 
     private fun showDialog(title: String, message: String) {
         TapTalkDialog.Builder(context)
-                .setDialogType(TapTalkDialog.DialogType.ERROR_DIALOG)
-                .setTitle(title)
-                .setMessage(message)
-                .setPrimaryButtonTitle(getString(R.string.tap_ok))
-                .setPrimaryButtonListener {}
-                .show()
+            .setDialogType(TapTalkDialog.DialogType.ERROR_DIALOG)
+            .setTitle(title)
+            .setMessage(message)
+            .setPrimaryButtonTitle(getString(R.string.tap_ok))
+            .setPrimaryButtonListener {}
+            .show()
     }
 
     private fun showRequestingOTPLoading() {
@@ -444,7 +591,7 @@ class TAPLoginVerificationFragment : Fragment() {
         iv_progress_otp.clearAnimation()
         ll_loading_otp.visibility = View.VISIBLE
         tv_loading_otp.text = resources.getText(R.string.tap_requesting_otp)
-        TAPUtils.getInstance().rotateAnimateInfinitely(context, iv_progress_otp)
+        TAPUtils.rotateAnimateInfinitely(context, iv_progress_otp)
     }
 
     private fun showVerifyingOTPLoading() {
@@ -453,6 +600,6 @@ class TAPLoginVerificationFragment : Fragment() {
         iv_progress_otp.clearAnimation()
         ll_loading_otp.visibility = View.VISIBLE
         tv_loading_otp.text = resources.getText(R.string.tap_verifying_otp)
-        TAPUtils.getInstance().rotateAnimateInfinitely(context, iv_progress_otp)
+        TAPUtils.rotateAnimateInfinitely(context, iv_progress_otp)
     }
 }
